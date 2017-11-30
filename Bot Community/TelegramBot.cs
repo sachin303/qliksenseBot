@@ -137,8 +137,14 @@ namespace Bot_Community
 
                 // Start some logic to answer the questions
 
+                if (MessageText.ToLower().StartsWith("show me"))
+                {
+                    response = "The value of sales is <a href='https://www.google.com'>hello</a> ";
+                    await Bot.SendTextMessageAsync(message.Chat.Id, response, true, parseMode: ParseMode.Html);
+                    return;
+                }
                 // This first block, only some basic predefined commands
-                if (MessageText.Contains("sales"))
+                else if (MessageText.Contains("sales"))
                 {
                     string Val = Usr.QS.GetExpression(MeasDefSales);
                     response = "The value of sales is " + Val;
@@ -271,7 +277,7 @@ namespace Bot_Community
                         msg = "The value of Inventory is " + val;
                         break;
                     case "cost":
-                        val = Usr.QS.GetExpression("Num(Sum(ExpenseActual), '#,##0.00 €')");
+                        val = Usr.QS.GetExpression("Num(Sum([Sales Cost Amount]), '#,##0.00 €')");
                         msg = "The value of Cost is " + val;
                         break;
                     case "analysis":
@@ -333,8 +339,9 @@ namespace Bot_Community
             // Add the user if not exists
             // All new users are allowed by default except if running in Demo Mode, they can be banned in the users file
             QSUser Usr = QlikUsers.AddUser(UserId, UserName);
+            Usr.QS = (Usr.QS == null) ? QSTemplateApp : Usr.QS;
 
-            if (Usr.QS == null)
+             if (Usr.QS == null)
             {   // This user has no connection
                 Usr.QS = new QSApp();
 
@@ -353,7 +360,10 @@ namespace Bot_Community
                     // Create or use the Telegram UserID as the Qlik Sense UserID to open the connection
                     Connect(Usr.QS, UserId, QSTemplateApp.VirtualProxy(), QSTemplateApp.IsUsingSSL());
                     // And open the app
-                    Usr.QS.QSOpenApp();
+                    if (!Usr.QS.AppIsOpen)
+                    {
+                        Usr.QS.QSOpenApp();
+                    }
 
                     Console.WriteLine(string.Format("Opened the Qlik Sense app: {0} for user {1} ({2})", Usr.QS.qsAppName, Usr.UserId, Usr.UserName));
                 }

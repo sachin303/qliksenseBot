@@ -55,8 +55,23 @@ namespace QlikSenseEasy
     // Class with he main properties for a Sheet
     public class QSSheet
     {
+        public QSSheet()
+        {
+            Visulizations = new List<QSVisualization>();
+        }
         public string Name { get; set; }
         public string Id { get; set; }
+        public IList<QSVisualization> Visulizations { get; set; }
+
+    }
+
+    public class QSVisualization
+    {
+        public string Id { get; set; }
+        public string Type { get; set; }    
+        public string Title { get; set; }
+        public string Name { get; set; }
+
     }
 
     // Class with he main properties for a Stream
@@ -311,6 +326,13 @@ namespace QlikSenseEasy
                 qss.Id = AppSheet.Id;
                 qss.Name = AppSheet.Properties.MetaDef.Title;
                 var m = AppSheet.Properties.MetaDef;
+
+                foreach (var child in AppSheet.Children.OfType<VisualizationBase>())
+                {
+                    qss.Visulizations.Add(new QSVisualization { Id = child.Id, Type = child.Info.Type, Title = child.Title, Name = (child.Meta == null) ? "": child.Meta.Name });
+                    //Console.WriteLine("Type:{0} ID:{1}", child.Info.Type, child.Info.Id);
+                }
+
                 Sheets.Add(qss);
             }
         }
