@@ -93,7 +93,8 @@ namespace Bot_Community
 
             Console.WriteLine("Inline query " + message.Query + " received by " + message.From.Id);
             //Bot
-           // await Bot.SendTextMessageAsync(message.Id, "Choose a Kpi", replyMarkup:  );
+
+            //await Bot.AnswerInlineQueryAsync(e.InlineQuery.Id, new[] { new InlineQueryResult { Id = "#web", InputMessageContent = new InputTextMessageContent { MessageText = "Web122" }, Title = "Web122Title" } });
            // return;
         }
 
