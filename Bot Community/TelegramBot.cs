@@ -139,7 +139,9 @@ namespace Bot_Community
 
                 if (MessageText.ToLower().StartsWith("show me"))
                 {
-                    response = "The value of sales is <a href='https://www.google.com'>hello</a> ";
+                    var vis = Usr.QS.FindVisualization(MessageText.ToLower().Replace("show me ", ""));
+                    var url = Usr.QS.PrepareVisualizationDirectLink(vis);
+                    response = $"I have found a chart that could be useful for your analysis. The chart is called '{vis.Title}' and you can open it here: <a href='{url}'>{vis.Title}</a>";
                     await Bot.SendTextMessageAsync(message.Chat.Id, response, true, parseMode: ParseMode.Html);
                     return;
                 }

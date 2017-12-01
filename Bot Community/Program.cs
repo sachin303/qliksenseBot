@@ -18,8 +18,8 @@ namespace Bot_Community
         static string cntqsServerVirtualProxy = "telegram";
 
         // The components used to build the single object links to apps, sheets, charts, etc.
-        static string cntqsSingleServer = "";
-        static string cntqsSingleApp = "";
+        static string cntqsSingleServer = "https://qlik.cygrp.com";
+        static string cntqsSingleApp = cntqsAppId;
         static string cntqsAlternativeStreams = "";
 
         // The QS object to connect to Qlik Sense

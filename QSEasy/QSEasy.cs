@@ -71,7 +71,7 @@ namespace QlikSenseEasy
         public string Type { get; set; }    
         public string Title { get; set; }
         public string Name { get; set; }
-
+        public string SheetId { get; set; }
     }
 
     // Class with he main properties for a Stream
@@ -144,6 +144,8 @@ namespace QlikSenseEasy
         // Sheets
         public List<QSSheet> Sheets = new List<QSSheet>();
 
+        public List<QSVisualization> Visualizations = new List<QSVisualization>();
+
         // Last queries
         public QSMasterItem LastMeasure;
         public QSMasterItem LastDimension;
@@ -210,8 +212,7 @@ namespace QlikSenseEasy
             X509Certificate2Collection certificateCollection = new X509Certificate2Collection(x509);
             // Defining the location as a direct connection to Qlik Sense Server
             qsLocation.AsDirectConnection("qlikdbs2", "qliksvc", certificateCollection: certificateCollection, certificateValidation: false);
-
-
+            
             qsLocation.IsVersionCheckActive = CheckSDKVersion;
             IHub MyHub = qsLocation.Hub();
 
@@ -329,7 +330,9 @@ namespace QlikSenseEasy
 
                 foreach (var child in AppSheet.Children.OfType<VisualizationBase>())
                 {
-                    qss.Visulizations.Add(new QSVisualization { Id = child.Id, Type = child.Info.Type, Title = child.Title, Name = (child.Meta == null) ? "": child.Meta.Name });
+                    var vis = new QSVisualization { SheetId = AppSheet.Id, Id = child.Id, Type = child.Info.Type, Title = child.Title, Name = (child.Meta == null) ? "" : child.Meta.Name };
+                    qss.Visulizations.Add(vis);
+                    Visualizations.Add(vis);
                     //Console.WriteLine("Type:{0} ID:{1}", child.Info.Type, child.Info.Id);
                 }
 
@@ -413,6 +416,21 @@ namespace QlikSenseEasy
             }
         }
 
+        public QSVisualization FindVisualization(string searchString)
+        {
+            var result = Visualizations.LevenshteinDistanceOf(m => m.Title)
+                    .ComparedTo(searchString)
+                    .OrderBy(m => m.Distance);
+
+            return result.FirstOrDefault().Item;
+        }
+
+        public string PrepareVisualizationDirectLink(QSVisualization vis)
+        {
+            //single/?appid=62905416-3e48-4267-aafe-797014fe2675&obj=dcksUYY&opt=nointeraction
+            string url = qsSingleServer + "/single/?app=" + qsSingleApp + "&obj=" + vis.Id + "&opt=nointeraction"; 
+            return url;
+        }
 
         // This function looks for the master measure most similar to MeasureName
         public QSMasterItem GetMasterMeasure(string MeasureName)
