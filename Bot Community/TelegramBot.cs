@@ -92,10 +92,29 @@ namespace Bot_Community
             var message = e.InlineQuery;
 
             Console.WriteLine("Inline query " + message.Query + " received by " + message.From.Id);
-            //Bot
+            InlineQueryResult[] results = {
 
-            //await Bot.AnswerInlineQueryAsync(e.InlineQuery.Id, new[] { new InlineQueryResult { Id = "#web", InputMessageContent = new InputTextMessageContent { MessageText = "Web122" }, Title = "Web122Title" } });
-           // return;
+                new InlineQueryResultArticle {
+                    Description = "Count by Building Type",
+                    Id ="1",
+                    Title = "Open", InputMessageContent = new InputTextMessageContent { MessageText= "Count by Building Type"},
+                    ReplyMarkup = new InlineKeyboardMarkup(new [] { new InlineKeyboardButton { Text = "Visualization", Url= "https://qlik.cygrp.com/single/?appid=a50879ff-8ecd-40de-86c2-fa9df9369564&obj=bgpQmyH&opt=nointeraction&select=clearall"} })
+                },
+                new InlineQueryResultArticle {
+                    Description = "Electricity",
+                    Id ="2",
+                    Title = "Open", InputMessageContent = new InputTextMessageContent { MessageText= "Electricity"},
+                    ReplyMarkup = new InlineKeyboardMarkup(new [] { new InlineKeyboardButton { Text = "Visualization", Url= "https://qlik.cygrp.com/single/?appid=a50879ff-8ecd-40de-86c2-fa9df9369564&obj=26c4d5ab-5ecf-48df-b2fd-6e631947bce9&opt=nointeraction&select=clearall" } })
+                },
+                new InlineQueryResultDocument{
+                    Id= "3",
+                    Title= "Tap document",
+                    MimeType= "application/pdf",
+                    Url= "http://www.pdf995.com/samples/pdf.pdf"
+                }
+        };
+
+            await Bot.AnswerInlineQueryAsync(e.InlineQuery.Id, results, isPersonal: true, cacheTime: 0);
         }
 
         public void CloseBot()
