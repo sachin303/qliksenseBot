@@ -418,7 +418,7 @@ namespace QlikSenseEasy
 
         public QSVisualization FindVisualization(string searchString)
         {
-            var result = Visualizations.LevenshteinDistanceOf(m => m.Title)
+            var result = Visualizations.Where(o=> !string.IsNullOrEmpty(o.Title)).LevenshteinDistanceOf(m => m.Title)
                     .ComparedTo(searchString)
                     .OrderBy(m => m.Distance);
 
