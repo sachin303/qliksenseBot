@@ -27,7 +27,9 @@ namespace Bot_Community
 
         
         // Here is where we insert the Bot Token
-        static string cntBotToken = "467810720:AAFJ4Ib_mrmCaFCaVlsqYdHYc4wPu1R3mYI";
+        static string cntBotToken = "498627711:AAEMx_mcDF4DMYjJcaYQ64LvMGL9z7wipzk";
+        //498627711:AAEMx_mcDF4DMYjJcaYQ64LvMGL9z7wipzk -- cygrp-qlik-test
+        //467810720:AAFJ4Ib_mrmCaFCaVlsqYdHYc4wPu1R3mYI --Agent
 
         // The Telegram Bot object
         static TelegramBot MyBot;

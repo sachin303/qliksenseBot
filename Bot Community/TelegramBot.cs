@@ -91,20 +91,23 @@ namespace Bot_Community
         {
             var message = e.InlineQuery;
 
+            QSUser Usr = CheckTheUser(message.From.Id.ToString(),
+                    message.From,
+                    message.From.FirstName + " " + message.From.LastName);
+
+           var vis = Usr.QS.FindVisualization(e.InlineQuery.Query);
+
             Console.WriteLine("Inline query " + message.Query + " received by " + message.From.Id);
             InlineQueryResult[] results = {
 
                 new InlineQueryResultArticle {
-                    Description = "Count by Building Type",
+                    Description = vis.Title,
                     Id ="1",
-                    Title = "Open", InputMessageContent = new InputTextMessageContent { MessageText= "Count by Building Type"},
-                    ReplyMarkup = new InlineKeyboardMarkup(new [] { new InlineKeyboardButton { Text = "Visualization", Url= "https://qlik.cygrp.com/single/?appid=a50879ff-8ecd-40de-86c2-fa9df9369564&obj=bgpQmyH&opt=nointeraction&select=clearall"} })
-                },
-                new InlineQueryResultArticle {
-                    Description = "Electricity",
-                    Id ="2",
-                    Title = "Open", InputMessageContent = new InputTextMessageContent { MessageText= "Electricity"},
-                    ReplyMarkup = new InlineKeyboardMarkup(new [] { new InlineKeyboardButton { Text = "Visualization", Url= "https://qlik.cygrp.com/single/?appid=a50879ff-8ecd-40de-86c2-fa9df9369564&obj=26c4d5ab-5ecf-48df-b2fd-6e631947bce9&opt=nointeraction&select=clearall" } })
+                    Title = vis.Title,
+                    InputMessageContent = new InputTextMessageContent { MessageText= vis.Title},
+                    ReplyMarkup = new InlineKeyboardMarkup(new [] {
+                        new InlineKeyboardButton { Text = "Open", Url= Usr.QS.PrepareVisualizationDirectLink(vis) }
+                    })
                 },
                 new InlineQueryResultDocument{
                     Id= "3",
@@ -112,7 +115,7 @@ namespace Bot_Community
                     MimeType= "application/pdf",
                     Url= "http://www.pdf995.com/samples/pdf.pdf"
                 }
-        };
+            };
 
             await Bot.AnswerInlineQueryAsync(e.InlineQuery.Id, results, isPersonal: true, cacheTime: 0);
         }
