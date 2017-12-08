@@ -170,10 +170,10 @@ namespace QlikSenseEasy
         {
             // Default values and initializations
             qsServer = "http://desktop-e106r7e";
-            qsAppName = "Consumer Goods Sales";
-            qsAppId = "787cc63e-3286-4d5b-a673-aaa3d5b86b8c";
+            qsAppName = "SAP";
+            qsAppId = "a50879ff-8ecd-40de-86c2-fa9df9369564";
             qsSingleServer = "http://desktop-e106r7e";
-            qsSingleApp = "787cc63e-3286-4d5b-a673-aaa3d5b86b8c";
+            qsSingleApp = "a50879ff-8ecd-40de-86c2-fa9df9369564";
 
             rnd = new Random();
         }
@@ -211,7 +211,7 @@ namespace QlikSenseEasy
             x509.Import(rawData, "test@123", X509KeyStorageFlags.UserKeySet);
             X509Certificate2Collection certificateCollection = new X509Certificate2Collection(x509);
             // Defining the location as a direct connection to Qlik Sense Server
-            qsLocation.AsDirectConnection("qlikdbs2", "qliksvc", certificateCollection: certificateCollection, certificateValidation: false);
+            qsLocation.AsDirectConnection("qlikdbs2", "usera", certificateCollection: certificateCollection, certificateValidation: false);
             
             qsLocation.IsVersionCheckActive = CheckSDKVersion;
             IHub MyHub = qsLocation.Hub();
@@ -397,7 +397,7 @@ namespace QlikSenseEasy
 
                 foreach (DimensionObjectViewListContainer md in allDimensions)
                 {
-                    if (md.Data.Grouping == NxGrpType.GRP_NX_NONE)  // This is to avoid drill-down dimensions, I only use single dimensions
+                    if (md.Data.Grouping == NxGrpType.GRP_NX_HIEARCHY)  // This is to avoid drill-down dimensions, I only use single dimensions
                     {
                         QSMasterItem mi = new QSMasterItem();
 
@@ -425,10 +425,27 @@ namespace QlikSenseEasy
             return result.FirstOrDefault().Item;
         }
 
+        public QSMasterItem GetMasterVisualizations(string VisName)
+        {
+            var result = MasterVisualizations.Where(o => !string.IsNullOrEmpty(o.Name)).LevenshteinDistanceOf(m => m.Name)
+                    .ComparedTo(VisName)
+                    .OrderBy(m => m.Distance);
+
+            return result.FirstOrDefault().Item;
+
+        }
+
         public string PrepareVisualizationDirectLink(QSVisualization vis)
         {
             //single/?appid=62905416-3e48-4267-aafe-797014fe2675&obj=dcksUYY&opt=nointeraction
             string url = qsSingleServer + "/single/?app=" + qsSingleApp + "&obj=" + vis.Id + "&opt=nointeraction"; 
+            return url;
+        }
+
+        public string PrepareMasterVisualizationDirectLink(QSMasterItem vis)
+        {
+            //single/?appid=62905416-3e48-4267-aafe-797014fe2675&obj=dcksUYY&opt=nointeraction
+            string url = qsSingleServer + "/single/?appid=" + qsSingleApp + "&obj=" + vis.Id + "&opt=nointeraction";
             return url;
         }
 
@@ -465,6 +482,38 @@ namespace QlikSenseEasy
             }
         }
 
+
+        public QSMasterItem GetMasterDimensions(string DimensionName)
+        {
+            // Look for a dimension in the app master dimensions, and return the name used in the app
+            QSMasterItem dim = MasterDimensions.Find(m => m.Name.ToLower().Trim() == DimensionName.ToLower().Trim());
+
+            if (dim == null)
+            {
+                // If not an exact match, try to find a master dimension that contains the dimension searched
+                dim = MasterDimensions.Find(m => m.Name.ToLower().Trim().Contains(DimensionName.ToLower().Trim()));
+            }
+            if (dim == null)
+            {
+                // Search based on similarity, using the Levenshteing algorithm, from the NinjaNye.SearchExtensions library
+                var result = MasterDimensions.LevenshteinDistanceOf(m => m.Name)
+                    .ComparedTo(DimensionName)
+                    .OrderBy(m => m.Distance);
+                if (result.Count() > 0)
+                    dim = (QSMasterItem)result.First().Item;
+            }
+
+            if (dim != null)
+            {
+                // Evaluate and return the master dimension expression
+                LastDimension = dim;
+                return dim;
+            }
+            else
+            {
+                return null;
+            }
+        }
 
 
 
