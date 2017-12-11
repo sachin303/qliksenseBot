@@ -425,6 +425,12 @@ namespace QlikSenseEasy
             return result.FirstOrDefault().Item;
         }
 
+        public string GetVisualizationThumbnailUrl(string visualization)
+        {
+            ///content/Default/qliksense-map.png
+            return qsSingleServer + $"/content/Default/qliksense-{visualization}.png";
+        }
+
         public string PrepareVisualizationDirectLink(QSVisualization vis)
         {
             //single/?appid=62905416-3e48-4267-aafe-797014fe2675&obj=dcksUYY&opt=nointeraction

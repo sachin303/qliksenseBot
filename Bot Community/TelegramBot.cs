@@ -53,6 +53,7 @@ namespace Bot_Community
 
             // The Telegram Bot object
             Bot = new TelegramBotClient(BotToken);
+            
             //Bot.WebProxy.
             // Set the calls that will receive the bot events
             SetBotCalls();
@@ -90,7 +91,7 @@ namespace Bot_Community
         private async void Bot_OnInlineQuery(object sender, InlineQueryEventArgs e)
         {
             var message = e.InlineQuery;
-
+            
             QSUser Usr = CheckTheUser(message.From.Id.ToString(),
                     message.From,
                     message.From.FirstName + " " + message.From.LastName);
@@ -104,10 +105,9 @@ namespace Bot_Community
                     Description = vis.Title,
                     Id ="1",
                     Title = vis.Title,
-                    InputMessageContent = new InputTextMessageContent { MessageText= vis.Title},
-                    ReplyMarkup = new InlineKeyboardMarkup(new [] {
-                        new InlineKeyboardButton { Text = "Open", Url= Usr.QS.PrepareVisualizationDirectLink(vis) }
-                    })
+                    InputMessageContent = new InputTextMessageContent { MessageText= vis.Title}
+                    , Url = Usr.QS.PrepareVisualizationDirectLink(vis)
+                    , ThumbUrl = Usr.QS.GetVisualizationThumbnailUrl(vis.Type)
                 },
                 new InlineQueryResultDocument{
                     Id= "3",
