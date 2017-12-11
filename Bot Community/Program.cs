@@ -10,9 +10,9 @@ namespace Bot_Community
     class Program
     {
         // This is the default Qlik Sense app for new users
-        static string user = "qliksvc";
-        static string cntqsAppName = "";
-        static string cntqsAppId = "62905416-3e48-4267-aafe-797014fe2675";
+        static string user = "usera";
+        static string cntqsAppName = "SAP";
+        static string cntqsAppId = "a50879ff-8ecd-40de-86c2-fa9df9369564";
         static string cntqsServer = "https://40.74.246.240:4747";
         static bool cntqsServerSSL = true;
         static string cntqsServerVirtualProxy = "telegram";
@@ -27,9 +27,7 @@ namespace Bot_Community
 
         
         // Here is where we insert the Bot Token
-        static string cntBotToken = "498627711:AAEMx_mcDF4DMYjJcaYQ64LvMGL9z7wipzk";
-        //498627711:AAEMx_mcDF4DMYjJcaYQ64LvMGL9z7wipzk -- cygrp-qlik-test
-        //467810720:AAFJ4Ib_mrmCaFCaVlsqYdHYc4wPu1R3mYI --Agent
+        static string cntBotToken = "467810720:AAFJ4Ib_mrmCaFCaVlsqYdHYc4wPu1R3mYI";
 
         // The Telegram Bot object
         static TelegramBot MyBot;

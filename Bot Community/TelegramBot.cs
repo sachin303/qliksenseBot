@@ -39,7 +39,7 @@ namespace Bot_Community
         const string MeasDefMargin = "Num(Sum([Sales Margin Amount])/Sum([Sales Amount]), '0.0%')";
         const string MeasDefInventory = "Num(Sum([Inventory]), '#,##0')";
         const string MeasDefCost = "Num(Sum([Sales Amount])-Sum([Sales Margin Amount]), '#,##0.00 €')";
-
+        
 
 
         public TelegramBot(string BotToken, QSApp TemplateApp)
@@ -91,30 +91,52 @@ namespace Bot_Community
         private async void Bot_OnInlineQuery(object sender, InlineQueryEventArgs e)
         {
             var message = e.InlineQuery;
-            
+         
             QSUser Usr = CheckTheUser(message.From.Id.ToString(),
                     message.From,
                     message.From.FirstName + " " + message.From.LastName);
 
-           var vis = Usr.QS.FindVisualization(e.InlineQuery.Query);
 
+            var vis = Usr.QS.FindVisualization(e.InlineQuery.Query);
+            var MasterMea = Usr.QS.GetMasterMeasure(e.InlineQuery.Query);
+            var MasterVis = Usr.QS.GetMasterVisualizations(e.InlineQuery.Query);
+            //var MasterDim = Usr.QS.GetMasterDimensions(e.InlineQuery.Query);
+            //Console.WriteLine(Usr.QS.GetExpressionValue(MasterDim.Expression));
             Console.WriteLine("Inline query " + message.Query + " received by " + message.From.Id);
             InlineQueryResult[] results = {
 
-                new InlineQueryResultArticle {
-                    Description = vis.Title,
+               new InlineQueryResultArticle {
+                    Description = "Visualizations",
                     Id ="1",
                     Title = vis.Title,
                     InputMessageContent = new InputTextMessageContent { MessageText= vis.Title}
                     , Url = Usr.QS.PrepareVisualizationDirectLink(vis)
-                    , ThumbUrl = Usr.QS.GetVisualizationThumbnailUrl(vis.Type)
+                    , ThumbUrl = Usr.QS.GetVisualizationThumbnailUrl(vis.Type), HideUrl= true
                 },
-                new InlineQueryResultDocument{
-                    Id= "3",
-                    Title= "Tap document",
-                    MimeType= "application/pdf",
-                    Url= "http://www.pdf995.com/samples/pdf.pdf"
+                new InlineQueryResultArticle {
+                    Description = "Master Visualizations",
+                    Id ="2",
+                    Title = MasterVis.Name,
+                    InputMessageContent = new InputTextMessageContent { MessageText= MasterVis.Name},
+                    Url = Usr.QS.PrepareMasterVisualizationDirectLink(MasterVis),
+                    HideUrl= true
+
+                },
+              new InlineQueryResultArticle {
+                    Description = "Measures",
+                    Id ="3",
+                    Title = MasterMea.Name,
+                    InputMessageContent = new InputTextMessageContent { MessageText= ("The value of Measure " + MasterMea.Name + " is " + MasterMea.FormattedExpression)}
+
                 }
+              //new InlineQueryResultArticle {
+              //      Description = "Dimensions",
+              //      Id ="4",
+              //      Title = MasterDim.Name,
+              //      InputMessageContent = new InputTextMessageContent { MessageText=  MasterDim.Name + ": " + Usr.QS.GetExpressionValue(MasterDim.Expression)}
+
+              //  }
+
             };
 
             await Bot.AnswerInlineQueryAsync(e.InlineQuery.Id, results, isPersonal: true, cacheTime: 0);
