@@ -26,13 +26,18 @@ namespace QlikConversationService
 
         public void ReadFromCSV(string FileName)
         {
-            List<QSUser> values;
+            List<QSUser> values = null;
             try
             {
-                values = File.ReadAllLines(FileName, System.Text.Encoding.Default)
-                                               .Skip(0)
-                                               .Select(v => QSUser.FromCsv(v))
-                                               .ToList();
+                var fileString = File.ReadAllLines(FileName, System.Text.Encoding.Default);
+                if (fileString.Any())
+                {
+                    values = fileString
+                            .Skip(0)
+                            .Where(v => v.Trim().Any())
+                            .Select(v => QSUser.FromCsv(v))
+                            .ToList();
+                }
             }
             catch (Exception e)
             {
