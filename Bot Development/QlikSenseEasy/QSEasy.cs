@@ -121,10 +121,23 @@ namespace QlikSenseEasy
 
     public class QSSheet
     {
+        public QSSheet()
+        {
+            Visulizations = new List<QSVisualization>();
+        }
         public string Name { get; set; }
         public string Id { get; set; }
+        public IList<QSVisualization> Visulizations { get; set; }
     }
 
+    public class QSVisualization
+    {
+        public string Id { get; set; }
+        public string Type { get; set; }
+        public string Title { get; set; }
+        public string Name { get; set; }
+        public string SheetId { get; set; }
+    }
 
     public class QSAppProperties
     {
@@ -185,6 +198,8 @@ namespace QlikSenseEasy
         public List<QSStory> Stories = new List<QSStory>();
 
         public List<QSSheet> Sheets = new List<QSSheet>();
+
+        public List<QSVisualization> Visualizations = new List<QSVisualization>();
 
         public List<QSAppProperties> qsAlternativeApps = new List<QSAppProperties>();
         public string qsAlternativeStreams = null;
@@ -441,6 +456,17 @@ namespace QlikSenseEasy
                 qss.Id = AppSheet.Id;
                 qss.Name = AppSheet.Properties.MetaDef.Title;
                 var m = AppSheet.Properties.MetaDef;
+
+                foreach (var child in AppSheet.Children.OfType<VisualizationBase>())
+                {
+                    var id = child.Id;
+                    var visType = child.Type;
+                    var visInfo = child.Info;
+                    var vis = new QSVisualization { SheetId = AppSheet.Id, Id = child.Id, Title= child.Title ,Type = child.Info.Type, Name = (child.Meta == null) ? "" : child.Meta.Name };
+                    qss.Visulizations.Add(vis);
+                    Visualizations.Add(vis);
+                }
+
                 Sheets.Add(qss);
             }
         }
@@ -1549,6 +1575,39 @@ namespace QlikSenseEasy
                 Console.WriteLine("QSEasy Error in QSReadMasterItems: {0} Exception caught.", e);
             }
 
+        }
+
+        public QSVisualization FindVisualization(string searchString)
+        {
+            var result = Visualizations.Where(o => !string.IsNullOrEmpty(o.Title)).LevenshteinDistanceOf(m => m.Title)
+                    .ComparedTo(searchString)
+                    .OrderBy(m => m.Distance);
+
+            return result.FirstOrDefault().Item;
+        }
+
+        public QSMasterItem GetMasterVisualizations(string VisName)
+        {
+            var result = MasterVisualizations.Where(o => !string.IsNullOrEmpty(o.Name)).LevenshteinDistanceOf(m => m.Name)
+                    .ComparedTo(VisName)
+                    .OrderBy(m => m.Distance);
+
+            return result.FirstOrDefault().Item;
+
+        }
+
+        public string PrepareVisualizationDirectLink(QSVisualization vis)
+        {
+            //single/?appid=62905416-3e48-4267-aafe-797014fe2675&obj=dcksUYY&opt=nointeraction
+            string url = qsSingleServer + "/single/?app=" + qsSingleApp + "&obj=" + vis.Id + "&opt=nointeraction";
+            return url;
+        }
+
+        public string PrepareMasterVisualizationDirectLink(QSMasterItem vis)
+        {
+            //single/?appid=62905416-3e48-4267-aafe-797014fe2675&obj=dcksUYY&opt=nointeraction
+            string url = qsSingleServer + "/single/?appid=" + qsSingleApp + "&obj=" + vis.Id + "&opt=nointeraction";
+            return url;
         }
 
         private static IEnumerable<IMasterObject> GetAllMasterObjects(IApp app)

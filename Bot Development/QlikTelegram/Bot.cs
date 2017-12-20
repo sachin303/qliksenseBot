@@ -370,7 +370,48 @@ namespace QlikTelegram
                     qsFounds = new QSFoundObject[0];
                 }
 
-                if (qsFounds.Length == 0) return;
+                 if (qsFounds.Length == 0) {
+
+                    var vis = Usr.QS.FindVisualization(inlineQueryEventArgs.InlineQuery.Query);
+                    var MasterMea = Usr.QS.GetMasterMeasure(inlineQueryEventArgs.InlineQuery.Query);
+                    var MasterVis = Usr.QS.GetMasterVisualizations(inlineQueryEventArgs.InlineQuery.Query);
+                    //var MasterDim = Usr.QS.GetMasterDimensions(e.InlineQuery.Query);
+
+                    var localQSFound = new List<QSFoundObject>();
+                    string ObjectURL = null;
+                    localQSFound.Add(new QSFoundObject {
+                            
+                        Description = vis.Title,
+                        ObjectType = vis.Type,
+                        ObjectId = vis.Id,
+                        ObjectURL = Usr.QS.PrepareVisualizationDirectLink(vis),
+                        HRef = "<a href=\"" + ObjectURL + "\"> Visualization </a>"
+
+                    });
+
+                    localQSFound.Add(new QSFoundObject
+                    {
+
+                        Description = MasterVis.Name,
+                        ObjectId = MasterVis.Id,
+                        ObjectURL = Usr.QS.PrepareMasterVisualizationDirectLink(MasterVis),
+                        HRef = "<a href=\"" + ObjectURL + "\"> Master Visualization </a>"
+
+                    });
+
+                    localQSFound.Add(new QSFoundObject
+                    {
+
+                        Description = MasterMea.Name,
+                        ObjectId = MasterMea.Id,
+                        HRef = ("The value of Measure " + MasterMea.Name + " is " + MasterMea.FormattedExpression)
+
+                    });
+
+                    qsFounds = localQSFound.ToArray();
+                    
+
+                };
 
                 InlineQueryResult[] results;
                 results = new InlineQueryResult[qsFounds.Length];
@@ -387,7 +428,7 @@ namespace QlikTelegram
                             ParseMode = ParseMode.Html
                         },
                         Url = f.ObjectURL,
-                        HideUrl = false,
+                        HideUrl = true,
                         ThumbUrl = f.ThumbURL
 
                         //,ThumbWidth = 25,
@@ -410,6 +451,7 @@ namespace QlikTelegram
           async void BotOnMessageReceived(object sender, MessageEventArgs messageEventArgs)
         {
             Console.WriteLine("message received");
+            string response = "";
             var message1 = messageEventArgs.Message;
             Console.WriteLine(message1.Text);
             //botClient.SendTextMessageAsync(message1.From.Id, message1.Text, replyMarkup: new ReplyKeyboardRemove()).Wait();
@@ -741,9 +783,20 @@ namespace QlikTelegram
                 {
                     // Do nothing
                 }
-                else
+                else if (Resp.TextMessage != null)
                 {
-                    ProcessConversationResponse(Resp, message.Chat.Id, Usr);
+                    if (MessageText.ToLower().StartsWith("show me"))
+                    {
+                        var vis = Usr.QS.FindVisualization(MessageText.ToLower().Replace("show me ", ""));
+                        var url = Usr.QS.PrepareVisualizationDirectLink(vis);
+                        response = $"I have found a chart that could be useful for your analysis. The chart is called '{vis.Title}' and you can open it here: <a href='{url}'>{vis.Title}</a>";
+                        await BotSendTextMessage(message.Chat.Id, response, true, parseMode: ParseMode.Html);
+                        return;
+                    }
+                    else
+                    {
+                        ProcessConversationResponse(Resp, message.Chat.Id, Usr);
+                    }
                 }
             }
             catch (Exception e)
