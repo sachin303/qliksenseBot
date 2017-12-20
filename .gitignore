@@ -4,3 +4,6 @@
 /Bot Community/obj/
 /Bot Community/obj/
 /.vs/*
+bin
+obj
+packages
