@@ -359,18 +359,20 @@ namespace QlikTelegram
 
             if (qsQuery.Length > 0)
             {
-                try
-                {
-                    qsFounds = Usr.QS.QSSearchObjects(inlineQueryEventArgs.InlineQuery.Query, true);
-                }
-                catch (Exception e)
-                {
-                    botLog.AddBotLine(string.Format("{0} Exception caught.", e), LogFile.LogType.logError);
+                //try
+                //{
+                //    qsFounds = Usr.QS.QSSearchObjects(inlineQueryEventArgs.InlineQuery.Query, true);
+                //}
+                //catch (Exception e)
+                //{
+                //    botLog.AddBotLine(string.Format("{0} Exception caught.", e), LogFile.LogType.logError);
 
-                    qsFounds = new QSFoundObject[0];
-                }
+                //    qsFounds = new QSFoundObject[0];
+                //}
 
-                 if (qsFounds.Length == 0) {
+                qsFounds = new QSFoundObject[0];
+
+                if (qsFounds.Length == 0) {
 
                     var vis = Usr.QS.FindVisualization(inlineQueryEventArgs.InlineQuery.Query);
                     var MasterMea = Usr.QS.GetMasterMeasure(inlineQueryEventArgs.InlineQuery.Query);
@@ -379,33 +381,35 @@ namespace QlikTelegram
 
                     var localQSFound = new List<QSFoundObject>();
                     string ObjectURL = null;
+                    
                     localQSFound.Add(new QSFoundObject {
                             
                         Description = vis.Title,
                         ObjectType = vis.Type,
                         ObjectId = vis.Id,
                         ObjectURL = Usr.QS.PrepareVisualizationDirectLink(vis),
-                        HRef = "<a href=\"" + ObjectURL + "\"> Visualization </a>"
+                        HRef = "<a href=\"" + ObjectURL + "\"> Visualization </a>",
+                        ThumbURL= Usr.QS.qsSingleServer + "/content/default/visualization.png"
+                       
 
                     });
-
                     localQSFound.Add(new QSFoundObject
                     {
 
                         Description = MasterVis.Name,
                         ObjectId = MasterVis.Id,
                         ObjectURL = Usr.QS.PrepareMasterVisualizationDirectLink(MasterVis),
-                        HRef = "<a href=\"" + ObjectURL + "\"> Master Visualization </a>"
+                        HRef = "<a href=\"" + ObjectURL + "\"> Master Visualization </a>",
+                        ThumbURL= Usr.QS.qsSingleServer + "/content/default/master_visualization.png"
 
                     });
-
                     localQSFound.Add(new QSFoundObject
                     {
 
                         Description = MasterMea.Name,
                         ObjectId = MasterMea.Id,
-                        HRef = ("The value of Measure " + MasterMea.Name + " is " + MasterMea.FormattedExpression)
-
+                        HRef = ("The value of Measure " + MasterMea.Name + " is " + MasterMea.FormattedExpression),
+                        ThumbURL = Usr.QS.qsSingleServer + "/content/default/measure.png"
                     });
 
                     qsFounds = localQSFound.ToArray();
@@ -428,7 +432,7 @@ namespace QlikTelegram
                             ParseMode = ParseMode.Html
                         },
                         Url = f.ObjectURL,
-                        HideUrl = true,
+                        HideUrl = false,
                         ThumbUrl = f.ThumbURL
 
                         //,ThumbWidth = 25,

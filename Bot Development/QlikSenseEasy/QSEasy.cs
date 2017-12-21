@@ -109,6 +109,7 @@ namespace QlikSenseEasy
         public string Id { get; set; }
         public string FormattedExpression { get; set; }
         public IEnumerable<string> Tags { get; set; }
+        public string Visualization { get; set; }
 
     }
 
@@ -137,6 +138,7 @@ namespace QlikSenseEasy
         public string Title { get; set; }
         public string Name { get; set; }
         public string SheetId { get; set; }
+        public string Visualization { get; set; }
     }
 
     public class QSAppProperties
@@ -462,7 +464,7 @@ namespace QlikSenseEasy
                     var id = child.Id;
                     var visType = child.Type;
                     var visInfo = child.Info;
-                    var vis = new QSVisualization { SheetId = AppSheet.Id, Id = child.Id, Title= child.Title ,Type = child.Info.Type, Name = (child.Meta == null) ? "" : child.Meta.Name };
+                    var vis = new QSVisualization { SheetId = AppSheet.Id,Id = child.Id, Title= child.Title, Visualization= child.Visualization , Type = child.Info.Type, Name = (child.Meta == null) ? "" : child.Meta.Name };
                     qss.Visulizations.Add(vis);
                     Visualizations.Add(vis);
                 }
