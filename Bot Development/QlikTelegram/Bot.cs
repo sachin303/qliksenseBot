@@ -380,7 +380,7 @@ namespace QlikTelegram
                     //var MasterDim = Usr.QS.GetMasterDimensions(e.InlineQuery.Query);
 
                     var localQSFound = new List<QSFoundObject>();
-                    string ObjectURL = null;
+                    string ObjectURL = Usr.QS.PrepareVisualizationDirectLink(vis);
                     
                     localQSFound.Add(new QSFoundObject {
                             
@@ -388,21 +388,24 @@ namespace QlikTelegram
                         ObjectType = vis.Type,
                         ObjectId = vis.Id,
                         ObjectURL = Usr.QS.PrepareVisualizationDirectLink(vis),
-                        HRef = "<a href=\"" + ObjectURL + "\"> Visualization </a>",
+                        HRef = "<a href=\"" + ObjectURL + "\">" + vis.Title + "</a>",
                         ThumbURL= Usr.QS.qsSingleServer + "/content/default/visualization.png"
                        
 
                     });
+                    ObjectURL = Usr.QS.PrepareMasterVisualizationDirectLink(MasterVis);
                     localQSFound.Add(new QSFoundObject
                     {
 
                         Description = MasterVis.Name,
                         ObjectId = MasterVis.Id,
                         ObjectURL = Usr.QS.PrepareMasterVisualizationDirectLink(MasterVis),
-                        HRef = "<a href=\"" + ObjectURL + "\"> Master Visualization </a>",
+                        HRef = "<a href=\"" + ObjectURL + "\">" + MasterVis.Name + "</a>",
                         ThumbURL= Usr.QS.qsSingleServer + "/content/default/master_visualization.png"
 
                     });
+
+                   
                     localQSFound.Add(new QSFoundObject
                     {
 
@@ -426,13 +429,14 @@ namespace QlikTelegram
                     {
                         Id = i.ToString(),
                         Title = f.Description,
+                        Description = f.ObjectType,
                         InputMessageContent = new InputTextMessageContent
                         {
                             MessageText = f.HRef,
-                            ParseMode = ParseMode.Html
+                            ParseMode= ParseMode.Html
                         },
                         Url = f.ObjectURL,
-                        HideUrl = false,
+                        HideUrl = true,
                         ThumbUrl = f.ThumbURL
 
                         //,ThumbWidth = 25,
