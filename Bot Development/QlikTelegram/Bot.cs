@@ -291,7 +291,8 @@ namespace QlikTelegram
         //when an inline query is received (@bot in any chat)
           async void BotOnInlineQueryReceived(object sender, InlineQueryEventArgs inlineQueryEventArgs)
         {
-            Console.WriteLine("Inline query received");
+
+            Console.WriteLine($"Inline query received {inlineQueryEventArgs.InlineQuery.Query}");
             QSFoundObject[] qsFounds;
             string qsQuery;
 
@@ -419,7 +420,7 @@ namespace QlikTelegram
                     
 
                 };
-
+                //botClient.a
                 InlineQueryResult[] results;
                 results = new InlineQueryResult[qsFounds.Length];
                 int i = 0;
@@ -446,7 +447,8 @@ namespace QlikTelegram
                 }
                 try
                 {
-                    await botClient.AnswerInlineQueryAsync(inlineQueryEventArgs.InlineQuery.Id, results, isPersonal: true, cacheTime: 0);
+                    
+                    await botClient.AnswerInlineQueryAsync(inlineQueryEventArgs.InlineQuery.Id, results, isPersonal: true, cacheTime: 0,nextOffset:inlineQueryEventArgs.InlineQuery.Query);
                 }
                 catch (Exception e)
                 {
